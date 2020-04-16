@@ -2,7 +2,6 @@
     <div>
       <h5>barChart</h5>
       <div id="barChart"></div>
-
     </div>
 </template>
 
@@ -11,46 +10,45 @@ import * as d3 from "d3";
 
 export default {
   mounted() {
-    console.log("mounted");
+    console.log("mounted!!!");
     this.drawChart();
     //console.log(this.csvFile);
   },
   data: () => ({
+    dataset : [9, 19, 29, 39, 29, 19, 9]
   }),
   methods: {
     drawChart() {
       var margin = {top: 10, right: 30, bottom: 30, left: 40},
-          width = 460 - margin.left - margin.right,
-          height = 400 - margin.top - margin.bottom;
+      width = 460 - margin.left - margin.right,
+      height = 400 - margin.top - margin.bottom;
 
-    // append the svg object to the body of the page
-    var svg = d3.select("#barChart")
-      .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-        .attr("transform",
-              "translate(" + margin.left + "," + margin.top + ")");
-    
-    //d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/1_OneNum.csv", function(data) {
-    d3.csv("http://image-dev.ohcoach.com/csv/category_two.csv", function(data) {
-      console.log(data);
-     
-      // X axis: scale and draw:
-      var x = d3.scaleLinear()
-          .domain([0, 20])     // can use this instead of 1000 to have the max of data: d3.max(data, function(d) { return +d.price })
-          .range([0, width]);
-      svg.append("g")
-          .attr("transform", "translate(0," + height + ")")
-          .call(d3.axisBottom(x));
+      // append the svg object to the body of the page
+      var svg = d3.select("#barChart")
+        .append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+          .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
 
-      // set the parameters for the histogram
-      var histogram = d3.histogram()
-          .value(function(d) { return d.toal_distance; })   // I need to give the vector of value
-          .domain(x.domain())  // then the domain of the graphic
-          .thresholds(x.ticks(70)); // then the numbers of bins
-    
-      });
+      svg.selectAll("bar") 
+        .data(this.dataset) 
+        .enter().append("rect") 
+        .attr("class", "chart__bar")
+        .attr("height", function(d, i) {return d * 5}) 
+        .attr("width", 40) 
+        .attr("x", function(d, i) {return (50 * i)}) 
+        .attr("y", function(d, i) {return (250 - d * 5)});
+
+      svg.selectAll("text")
+        .data(this.dataset)
+        .enter().append("text")
+        .text(function(d) {return d})
+          .attr("class", "chart__dataLabel")
+          .attr("x", function(d, i) {return 50 * i + 11})
+          .attr("y", function(d, i) {return 250 - d*5 + 15});
+
     }
   }
 }
@@ -58,4 +56,18 @@ export default {
 </script>
 
 <style>
+.chart__bar {
+  /* 차트 막대 색 */
+  fill: #569fc9;
+  fill-opacity: 0.3;
+  stroke: #569fc9;
+}
+.chart__bar:hover {
+  fill-opacity: 1;
+}
+
+.chart__dataLabel {
+  fill: white;
+  font-weight:bold;
+}
 </style> 
