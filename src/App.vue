@@ -1,18 +1,18 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+    <router-link to="/">
+      <img alt="Vue logo" src="./assets/d3_logo.jpg" />
+    </router-link>
+    <layout-view></layout-view>
   </div>
 </template>
 
-<script>
-import HelloWorld from "./components/HelloWorld.vue";
+<!-- <script src="https://d3js.org/d3.v5.js"></script> -->
 
+
+<script>
 export default {
-  name: "App",
-  components: {
-    HelloWorld
-  }
+  name: "App"
 };
 </script>
 
