@@ -4,7 +4,6 @@
       <ul>
         <li>1. 막대 그래프 기본<button class="button__draw" @click="drawBar">DRAW</button></li>
         <li>2. 오코치 막대 그래프<button class="button__draw" @click="drawTotalDistance">DRAW</button></li>
-        <li>3. x축 between, grid 추가 그래프<button class="button__draw" @click="addGrid">DRAW</button></li>
       </ul>
       <div id="barChart"></div>
       <div id="totalDistanceChart"></div>
@@ -13,7 +12,6 @@
 
 <script>
 import * as d3 from "d3";
-import bar from "../../mixins/chart/bar.js";
 
 export default {
   mounted() {
@@ -21,18 +19,24 @@ export default {
   },
   created(){
   },
-  mixins: [bar],
   data: () => ({
     url: "",
+    margin: {top: 10, right: 30, bottom: 30, left: 40},
     arrayData: [9, 19, 29, 39, 29, 19, 9],
     objData : [{x:'A', y:9}, {x:'B', y:19}, {x:'C', y:29}, {x:'D', y:39}, {x:'E', y:29}, {x:'F', y:19}, {x:'G', y:9}],
     csvData: [],
+    margin: {top: 30, right: 30, bottom: 70, left: 60},
     maxValueOfYaxis: 0
   }),
-  methods: {
-    addGrid: function() {
-
+  computed: {
+    width() {
+      return  820 - this.margin.left - this.margin.right;
     },
+    height() {
+      return 400 - this.margin.top - this.margin.bottom;
+    },
+  },
+  methods: {
     drawBar: function() {
       // 여러개 생기는 것 방지 하기 위해서.
       d3.select("svg").remove();
@@ -83,6 +87,7 @@ export default {
       svgG.append("g")
         .call(d3.axisLeft(yScale).ticks(10));
     },
+
     drawTotalDistance: async function() {
       d3.select("svg").remove(); // 두번씩 생기는 걸 방지하기 위해
       
@@ -97,54 +102,65 @@ export default {
       
       // X축 범위 지정 
       const xScale = d3.scaleBand()
-        .domain(this.csvData.map(function(d) { return d.Category;} ))
+        // .domain(this.csvData.map(function(d) { return d.Category;} ))
         .range([0, this.width]).padding(0.2)
-
-
       // y축 값의 최대값을 구하기 위해서
       this.maxValueOfYaxis = Math.max(...this.csvData.map(data => data.total_distance), 0);
       // Y축 범위 지정
       const yScale = d3.scaleLinear()
-        .domain([0, this.maxValueOfYaxis])
+        // .([0, this.maxValueOfYaxis])
         .range([this.height, 0]);
 
       // plotLine group
-      const svgGXaxis = svg.append("g").attr("class", "chart__xaxis");
-      const svgGYaxis = svg.append("g").attr("class", "chart__yAxis");
-      const svgGYaxisLabel = svg.append("g").attr("class", "chart__yAxis-label");
-      const svgGPlotLine = svg.append("g")
-        .attr("class", "chart__plotLine-avg");
+      const svgGXaxis = svg.append("g");
+      const svgGYaxis = svg.append("g");
+      const svgGYaxisLabel = svg.append("g");
+      const svgGPlotLine = svg.append("g");
       // chart series group
       const svgG = svg.append("g")
       
-      this.drawXaxis(xScale);
-      this.drawYaxis(yScale);
-      this.drawPlotLine(xScale, yScale);
+      this.drawXaxis(svgGXaxis, xScale);
+      this.drawYaxis(svgGYaxis, yScale, svgGYaxisLabel);
+      this.drawPlotLine(svgGPlotLine, xScale, yScale);
       this.drawSeriesBar(svgG, xScale, yScale);
     },
-    drawPlotLine(xScale, yScale) {
-      // 데이터의 평균을 구하기 위해서
-      const averageData = this.setAverageTotaldistance(this.csvData);
-      // svg 안에서는 this를 쓸 수 없기 떄문에 미리 정해준다.
+    make_x_gridlines(xScale) {		
+      return d3.axisBottom(xScale)
+    },
+    make_y_gridlines(yScale) {		
+      return d3.axisLeft(yScale).ticks(4)
+    },
+    drawXaxis(svgGXaxis, xScale) {
+      let height = this.height;
+        svgGXaxis.attr("class", "chart__xaxis")
+          .attr("transform", "translate(0," + (height) + ")")
+          // .call(d3.axisBottom(xScale)
+          .call(this.make_x_gridlines(xScale)
+            .tickSize(-height)
+            .tickFormat("")
+          )
+          // text style
+          .selectAll("text")
+            .attr("transform", "translate(0,0)rotate(-45)")
+            .style("text-anchor", "end");
+    },
+    drawYaxis(svgGYaxis, yScale, svgGYaxisLabel) {
       let width = this.width;
-      // 평균값 PlotLine
-      let svgGPlotLine = d3.select(".chart__plotLine-avg");
-      svgGPlotLine.append("line")
-        .attr("x1", xScale(0))
-        .attr("x2", width)
-        .attr("y1", yScale(averageData))
-        .attr("y2", yScale(averageData))
-        .attr("stroke", "#00EBB2") 
-        .attr("stroke-width", "2")
-
-      // 평균 값 텍스트
-      svgGPlotLine.append("text")
-        .attr("class", "chart__plotLine-label")
-        .attr("x", width - 80)
-        .attr("y", yScale(averageData + 300))
+      
+      svgGYaxis.attr("class", "chart__yAxis")
+      // .call(d3.axisLeft(yScale).ticks(4)
+      .call(this.make_y_gridlines(yScale)
+        .tickSize(-width)
+      );
+      svgGYaxisLabel.append("text")
+        .attr("class", "chart__yAxis-label")
+        // y축 라벨 style
+        .attr("class", "chart__yAxis-label")
+        .attr("x", -25)
+        .attr("y", yScale(this.maxValueOfYaxis) - 10)
         .append("tspan")
-          .text(`평균 값: ${averageData}`)
-          .style("font-size", "15px")
+          .text("m")
+          .style("font-size", "12px");
     },
     drawSeriesBar(svgG, xScale, yScale) {
       let height = this.height;
@@ -168,35 +184,32 @@ export default {
           .style("text-anchor", "middle")
           .attr("y", function(d, i) {return yScale(d.total_distance) + 15});
     },
-    drawXaxis(xScale) {
-      let height = this.height;
-      let svgGXaxis = d3.select(".chart__xaxis");
-      svgGXaxis.attr("transform", "translate(0," + (height) + ")")
-        .call(d3.axisBottom(xScale)
-          // .tickSize(-height)
-        )
-        // text style
-        .selectAll("text")
-          .attr("transform", "translate(0,0)rotate(-45)")
-          .style("text-anchor", "end");
-    },
-    drawYaxis(yScale) {
+    drawPlotLine(svgGPlotLine, xScale, yScale) {
+      // 데이터의 평균을 구하기 위해서
+      const averageData = this.setAverageTotaldistance(this.csvData);
+      // svg 안에서는 this를 쓸 수 없기 떄문에 미리 정해준다.
       let width = this.width;
-      let svgGYaxis = d3.select(".chart__yAxis");
-      svgGYaxis.call(d3.axisLeft(yScale).ticks(4)
-        // .tickSize(-width)
-      );
+      let height = this.height;
 
-      let svgGYaxisLabel = d3.select(".chart__yAxis-label");
-      svgGYaxisLabel.append("text")
-        // y축 라벨 style
-        .attr("x", -25)
-        .attr("y", yScale(this.maxValueOfYaxis) - 10)
+      // 평균값 PlotLine
+      svgGPlotLine.attr("class", "chart__plotLine-avg")
+        .append("line")
+        .attr("x1", xScale(0))
+        .attr("x2", width)
+        .attr("y1", yScale(averageData))
+        .attr("y2", yScale(averageData))
+        .attr("stroke", "#00EBB2")
+        .attr("stroke-width", "2")
+
+      // 평균 값 텍스트
+      svgGPlotLine.append("text")
+        .attr("class", "chart__plotLine-label")
+        .attr("x", width - 80)
+        .attr("y", yScale(averageData + 300))
         .append("tspan")
-          .text("m")
-          .style("font-size", "12px");
+          .text(`평균 값: ${averageData}`)
+          .style("font-size", "15px")
     },
-    
     setCsvFile: async function(url) {
       // csv파일 불러오기 위한 함수.
       let getCsvFile = function(filePath) {
