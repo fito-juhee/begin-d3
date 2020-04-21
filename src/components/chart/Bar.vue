@@ -5,6 +5,7 @@
         <li>1. 막대 그래프 기본<button class="button__draw" @click="drawBar">DRAW</button></li>
         <li>2. 오코치 막대 그래프<button class="button__draw" @click="drawTotalDistance">DRAW</button></li>
         <li>3. x축 between, grid 추가 그래프<button class="button__draw" @click="addGrid">DRAW</button></li>
+        <li>4. tick 조정 Bar Draw <button class="button__draw" @click="drawBarTick">Cheol-DRAW</button></li>
       </ul>
       <div id="barChart"></div>
       <div id="totalDistanceChart"></div>
@@ -207,6 +208,50 @@ export default {
     setAverageTotaldistance(arr) {
       let averageData = arr.reduce((sum, el) => sum + Number(el.total_distance), 0) / arr.length;
       return averageData;
+    },
+    async drawBarTick(){
+      console.log("drawBarTick Click", this.width)
+      d3.select("svg").remove(); // 두번씩 생기는 걸 방지하기 위해
+      
+      await this.setCsvFile("http://image-dev.ohcoach.com/csv/category_two.csv");
+      
+      // append the svg object to the body of the page
+      const svg = d3.select("#totalDistanceChart").append("svg")
+        .attr("width", this.width + this.margin.left + this.margin.right)
+        .attr("height", this.height + this.margin.top + this.margin.bottom)
+        .append("g")
+          .attr("transform",
+                "translate(" + this.margin.left + "," + this.margin.top + ")");
+      
+      // X축 범위 지정 
+      
+      const xScale = d3.scaleLinear()
+        .domain([0, this.csvData.length])
+        .range([0, this.width])
+      
+      const svgGXaxis = svg.append("g").attr("class", "chart__xaxis");
+
+      // 그리드 그리기
+      svg.append("g").attr("class", "grid")
+                    .attr("transform", "translate(0," + (this.height) + ")")
+                    .call(this.make_x_gridlines()
+                      .tickSize(-this.height)
+                      .tickFormat("")
+                    )
+      // x축 그리기
+      svgGXaxis.attr("transform", "translate(0," + (this.height) + ")")
+        .call(d3.axisBottom(xScale).ticks(20))
+        .selectAll("text")
+        .attr("transform", "translate(0,0)rotate(-45)")
+        .style("text-anchor", "end");
+
+
+    },
+    // gridlines in x axis function
+    make_x_gridlines() {		
+        var x = d3.scaleTime().domain([0, this.csvData.length])
+                              .range([0, this.width]);
+      return d3.axisBottom(x).ticks(5)
     }
   }
 }
