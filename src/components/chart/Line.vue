@@ -1,6 +1,10 @@
 <template>
   <div>
-    룰루랄라 D3로 만들어보지~
+    <h3>룰루랄라 D3로 {{ chart }} 만들어보지~</h3>
+    <ul>
+        <li>1. line example <button class="button__draw" @click="exampleLineChart">DRAW</button></li>
+        <li>2. 오코치 speed 그래프<button class="button__draw" @click="drawLineChart">DRAW</button></li>
+      </ul>
     <div id="lineSpeedChart"></div>
     <div id="exampleLineChart"></div>
   </div>
@@ -13,12 +17,13 @@ import bar from "../../mixins/chart/bar.js";
 export default {
   mixins: [bar],
   mounted() {
-    // this.drawLineChart();
-    this.exampleLineChart();
+    this.drawLineChart();
+    // this.exampleLineChart();
   },
   computed: {
   },
   data: () => ({
+    chart: "Line",
     OhcoachSpeedChartUrl: "http://image-dev.ohcoach.com/csv/speedChart.csv",
     lineExampleUrl: "http://image-dev.ohcoach.com/csv/lineChart.csv",
   }),
@@ -31,8 +36,10 @@ export default {
         .attr("class", "chart__root")
         .attr("width", this.width)
         .attr("height", this.height)
+        .attr("transform",
+                "translate(" + this.margin.left + "," + this.margin.top + ")");
 
-      // await this.setCsvFile(this.url);
+      await this.setCsvFile(this.OhcoachSpeedChartUrl);
 
       /* 
       차트의 배경을 정의해준다. 
@@ -48,20 +55,20 @@ export default {
         .attr("y", 0)
 
       const xAxisGridGroup = chartRoot.append("g")
-        .attr("class", "chart__xAxis-grid");
+        .attr("class", "chart__grid chart__grid-xaxis");
       const yAxisGridGroup = chartRoot.append("g")
-        .attr("class", "chart__yAxis-grid");
+        .attr("class", "chart__grid chart__grid-yaxis");
+      // y축 영역 
+      const yAxisGroup = chartRoot.append("g")
+        .attr("class", "chart__yAxis");
       // x축 영역 
       const xAxisGroup = chartRoot.append("g")
         .attr("class", "chart__xAxis");
-      const yAxisGroup = chartRoot.append("g")
-        .attr("class", "chart__yAxis");
 
       const seriesGroup = chartRoot.append("g")
         .attr("class", "chart__series-line");
-
-      // parse the date / time
-      var parseTime = d3.timeParse("%H:%M:%SZ");
+        
+      const parseTime = d3.timeParse("%Y-%m-%d %H:%M:%s");
 
       // set the ranges
       var x = d3.scaleTime().range([0, this.width]);
@@ -69,10 +76,9 @@ export default {
 
       // define the line
       var valueline = d3.line()
-          .x(function(d) { return x(d.dateTime); })
-          .y(function(d) { return y(d.averageSpeed); });
-
-      console.log(valueline);
+          .x(function(d) { return x(d.DateTime); })
+          .y(function(d) { return y(d.averageSpeed); }
+      );
 
       // gridlines in x axis function
       function make_x_gridlines() {		
@@ -83,52 +89,42 @@ export default {
       // gridlines in y axis function
       function make_y_gridlines() {		
           return d3.axisLeft(y)
-              .ticks(5)
+              .ticks(4)
       }
 
-
-      // format the data
+       // format the data
       this.csvData.forEach(function(d) {
-          d.averageSpeed = +d.averageSpeed;
+        d.DateTime = parseTime(d.DateTime);
+        d.averageSpeed = +d.averageSpeed;
       });
-      console.log(this.csvData);
 
       // Scale the range of the data
-      x.domain(d3.extent(this.csvData, function(d) { return d.dateTime; }));
+      x.domain(d3.extent(this.csvData, function(d) { return d.DateTime; }));
       y.domain([0, d3.max(this.csvData, function(d) { return d.averageSpeed; })]);
-
+      
       // add the X gridlines
-      xAxisGridGroup.attr("class", "grid")
-          .call(make_x_gridlines()
-              .tickSize(-this.height)
-              .tickFormat("")
-          )
-
+      xAxisGridGroup.attr("transform", "translate(0," + (Number(this.height) - 20)+ ")")
+        .call(make_x_gridlines()
+        .tickSize(-this.height)
+        .tickFormat("")
+      )
       // add the Y gridlines
-      yAxisGridGroup.attr("class", "grid")
-          .call(make_y_gridlines()
-              .tickSize(-this.width)
-              .tickFormat("")
-          )
+      yAxisGridGroup.call(make_y_gridlines()
+          .tickSize(-this.width)
+          .tickFormat("")
+      )
 
-      // add the valueline path.
-      seriesGroup.append("path")
-          .data([this.csvData])
-          .attr("class", "line")
-          .attr("d", valueline);
-
-      // add the X Axis
-      xAxisGroup.attr("transform", "translate(0," + this.height + ")")
-          .call(d3.axisBottom(x));
+        // add the X Axis
+      xAxisGroup.attr("transform", "translate(10," +  (Number(this.height) - 20) + ")")
+        .call(d3.axisBottom(x));
 
       // add the Y Axis
       yAxisGroup.call(d3.axisLeft(y));
 
     },
     exampleLineChart: async function() {
-      console.log("1");
+      d3.select("svg").remove();
       await this.setCsvFile(this.lineExampleUrl);
-      console.log("2");
 
       var margin = {top: 20, right: 20, bottom: 30, left: 50},
           width = 960 - margin.left - margin.right,
@@ -145,7 +141,9 @@ export default {
       // define the line
       var valueline = d3.line()
           .x(function(d) { return x(d.date); })
-          .y(function(d) { return y(d.close); });
+          .y(function(d) { return y(d.close); }
+      );
+
 
       // append the svg obgect to the body of the page
       // appends a 'group' element to 'svg'
@@ -166,7 +164,7 @@ export default {
       // gridlines in y axis function
       function make_y_gridlines() {		
           return d3.axisLeft(y)
-              .ticks(5)
+              .ticks(4)
       }
 
       // format the data
@@ -223,5 +221,21 @@ export default {
 
 .chart__grid path {
   stroke: none;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+.grid line {
+  stroke: lightgrey;
+  stroke-opacity: 0.7;
+  shape-rendering: crispEdges;
+}
+
+.grid path {
+  stroke-width: 0;
 }
 </style>

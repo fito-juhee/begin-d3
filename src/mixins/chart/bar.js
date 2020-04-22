@@ -9,6 +9,9 @@ const bar = {
     csvData: []
   }),
   computed: {
+    width() {
+     
+    }
     
   },
   methods: {
