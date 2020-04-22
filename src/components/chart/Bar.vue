@@ -26,7 +26,6 @@ export default {
     url: "",
     arrayData: [9, 19, 29, 39, 29, 19, 9],
     objData : [{x:'A', y:9}, {x:'B', y:19}, {x:'C', y:29}, {x:'D', y:39}, {x:'E', y:29}, {x:'F', y:19}, {x:'G', y:9}],
-    csvData: [],
     maxValueOfYaxis: 0
   }),
   methods: {
@@ -197,13 +196,7 @@ export default {
           .style("font-size", "12px");
     },
     
-    setCsvFile: async function(url) {
-      // csv파일 불러오기 위한 함수.
-      let getCsvFile = function(filePath) {
-        return d3.csv(filePath);
-      }
-      this.csvData = await getCsvFile(url);
-    },
+    
     setAverageTotaldistance(arr) {
       let averageData = arr.reduce((sum, el) => sum + Number(el.total_distance), 0) / arr.length;
       return averageData;
