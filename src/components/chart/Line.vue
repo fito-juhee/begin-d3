@@ -169,56 +169,59 @@ export default {
               .ticks(5)
       }
 
-      // Get the data
+      // format the data
+      this.csvData.forEach(function(d) {
+        d.date = parseTime(d.date);
+        d.close = +d.close;
+      });
 
-        // format the data
-        this.csvData.forEach(function(d) {
-          console.log(d);
-          d.date = parseTime(d.date);
-          d.close = +d.close;
-        });
+      // Scale the range of the data
+      x.domain(d3.extent(this.csvData, function(d) { return d.date; }));
+      y.domain([0, d3.max(this.csvData, function(d) { return d.close; })]);
 
-        // Scale the range of the data
-        x.domain(d3.extent(this.csvData, function(d) { return d.date; }));
-        y.domain([0, d3.max(this.csvData, function(d) { return d.close; })]);
+      // add the X gridlines
+      svg.append("g")			
+          .attr("class", "chart__grid chart__grid-xaxis")
+          .attr("transform", "translate(0," + height + ")")
+          .call(make_x_gridlines()
+              .tickSize(-height)
+              .tickFormat("")
+          )
 
-        // add the X gridlines
-        svg.append("g")			
-            .attr("class", "grid")
-            .attr("transform", "translate(0," + height + ")")
-            .call(make_x_gridlines()
-                .tickSize(-height)
-                .tickFormat("")
-            )
+      // add the Y gridlines
+      svg.append("g")			
+        .attr("class", "chart__grid chart__grid-yaxis")
+        .call(make_y_gridlines()
+            .tickSize(-width)
+            .tickFormat("")
+        )
 
-        // add the Y gridlines
-        svg.append("g")			
-            .attr("class", "grid")
-            .call(make_y_gridlines()
-                .tickSize(-width)
-                .tickFormat("")
-            )
+      // add the valueline path.
+      svg.append("path")
+        .data([this.csvData])
+        .attr("class", "line")
+        .attr("d", valueline);
 
-        // add the valueline path.
-        svg.append("path")
-            .data([this.csvData])
-            .attr("class", "line")
-            .attr("d", valueline);
+      // add the X Axis
+      svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x));
 
-        // add the X Axis
-        svg.append("g")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(x));
-
-        // add the Y Axis
-        svg.append("g")
-            .call(d3.axisLeft(y));
-
+      // add the Y Axis
+      svg.append("g")
+        .call(d3.axisLeft(y));
     }
   }
 }
 </script>
 
 <style>
+.chart__grid line {
+  color: pink;
+  fill: hotpink;
+}
 
+.chart__grid path {
+  stroke: none;
+}
 </style>
