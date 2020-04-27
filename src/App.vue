@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <router-link to="/">
-      <img alt="Vue logo" src="./assets/d3_logo.jpg" />
+      <img alt="Vue logo" src="./assets/images/default/d3_logo.jpg" />
     </router-link>
     <layout-view></layout-view>
   </div>

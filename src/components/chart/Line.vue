@@ -1,12 +1,22 @@
 <template>
-  <div>
+  <div class="line__container">
     <h3>룰루랄라 D3로 {{ chart }} 만들어보지~</h3>
-    <ul>
-        <li>1. line example <button class="button__draw" @click="exampleLineChart">DRAW</button></li>
-        <li>2. 오코치 speed 그래프<button class="button__draw" @click="drawLineChart">DRAW</button></li>
-      </ul>
-    <div id="lineSpeedChart"></div>
+    <ul class="line__list">
+      <li> 
+        <button class="button__draw" @click="exampleLineChart">Line Example</button>
+      </li>
+      <li>
+      <button class="button__draw" @click="drawLineChart">Ohcoach Speed</button>
+      </li>
+    </ul>
     <div id="exampleLineChart"></div>
+    <div id="lineSpeedChart"></div>
+    <div id="ohcoachChart">
+      <img 
+        width="820px"
+        height="400px"
+        src="../../assets/images/ohcoach_capture/speedChart.png" alt="ohcoach-speed-chart-image" />
+    </div>
   </div>
 </template>
 
