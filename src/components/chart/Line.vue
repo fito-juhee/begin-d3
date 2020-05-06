@@ -73,17 +73,6 @@ export default {
         .attr("y", 0)
         .attr("transform",
           "translate(" + this.margin.right + "," + this.margin.top + ")");  
-      /* navigator 영역 설정  */
-      const navigatorGroup = chartRoot.append("g")
-        .attr("class", "chart__navigator")
-        .attr("transform", "translate(" + this.margin.right + "," + (this.height + this.margin.bottom) + ")");
-      /* x축 영역 설정 */
-      const navigatorXaxisGroup = chartRoot.append("g")
-        .attr("class", "chart__navigator-xaxis")
-        .attr("transform", "translate(" + this.margin.right + "," + (this.marginNavigator.top + this.marginNavigator.bottom) + ")");
-      const navigatorSeriesGroup = chartRoot.append("g")
-        .attr("class", "chart__navigator-series")
-        .attr("transform", "translate(" + this.margin.right + "," + (this.height + 120) + ")");
       /* x축 그리드 영역 설정 */
       const xAxisGridGroup = chartRoot.append("g")
         .attr("class", "chart__grid chart__grid-xaxis")
@@ -108,10 +97,6 @@ export default {
       // set the ranges:: x축과 y축의 범위를 설정해준다. (차트영역)
       const x = d3.scaleTime().range([0, this.width]);
       const y = d3.scaleLinear().range([this.height, 0]);
-      // navigator 영역
-      const x2 = d3.scaleTime().range([0, this.width]);
-      const y2 = d3.scaleLinear().range([this.heightNavigator, 0]);
-      
       // 축의 데이터 범위 설정 
       const dataXrange = d3.extent(this.csvData, function(d) { return d.DateTime; });
       const dataYrange = [0, d3.max(this.csvData, function(d) { return +d.averageSpeed; })];
@@ -141,19 +126,11 @@ export default {
       // 1. Scale the range of the data
       x.domain(d3.extent(this.csvData, function(d) { return d.DateTime; }));
       y.domain(dataYrange);
-      // navigator 영역
-      x2.domain(d3.extent(this.csvData, function(d) { return d.DateTime; }));
-      y2.domain(y.domain());
 
       // 2. add the X Axis
       xAxisGroup.call(d3.axisBottom(x)
         // x축의 tick을 15분 마다 한번씩 찍도록 함.
         .ticks(d3.timeMinute.every(15))
-      );
-      // navigator의 x축
-      navigatorXaxisGroup.call(d3.axisBottom(x2)
-        .tickSize(this.heightNavigator)
-        .ticks(2)
       );
 
       // 3. gridlines in x axis function
@@ -181,10 +158,6 @@ export default {
       const averageLine = d3.line()
         .x(function(d) { return x(d.DateTime); })
         .y(function(d) { return y(d.averageSpeed); });
-      // navigator line 그래프
-      const navigatorAverageLine = d3.line()
-        .x(function(d) { return x2(d.DateTime); })
-        .y(function(d) { return y2(d.averageSpeed); });
       // define the average (max - min) area 그래프
       const averageArea = d3.area()
         .curve(d3.curveStep)
@@ -207,13 +180,6 @@ export default {
         .attr("fill", "none")
         .attr("stroke", "rgba(70, 130, 180, 0.42)")
         .attr("stroke-width", 1.2);// 평균 스피드 그래프 그리는 영역
-      navigatorSeriesGroup.append("path")
-        .data([this.csvData])
-        .attr("class", "chart__navigator-line")
-        .attr("d", navigatorAverageLine)
-        .attr("fill", "none")
-        .attr("stroke", "red")
-        .attr("stroke-width", 1.2);
       },
     exampleLineChart: async function() {
       d3.select("svg").remove();

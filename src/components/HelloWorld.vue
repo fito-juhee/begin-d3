@@ -43,11 +43,15 @@
         >
       </li>
       <li>
-        <a
-          href="/line"
-          rel="noopener"
-          >line</a
-        >
+        <ul class="list__col">
+          <li>
+            <a href="/line" rel="noopener">line</a>
+          </li>
+          <li>
+            <a href="/speedRange">range-line</a>
+          </li>
+        </ul>
+        
       </li>
       <li>
         <a
@@ -85,5 +89,10 @@ li {
 }
 a {
   color: #42b983;
+}
+.list__col {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
 }
 </style>
