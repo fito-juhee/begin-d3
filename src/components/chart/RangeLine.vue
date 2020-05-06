@@ -50,8 +50,10 @@ export default {
       //TODO: 주석 달기 ==> x축 dateTime 시 분 초 렌더링??
       const parseDateTime = d3.timeParse("%Y-%m-%d %I:%M:%S");
       const bisectDate = d3.bisector(function(d) { return d.DateTime; }).left;
-
-      // 그래프로 그리기 전에 쓸 수 있는 데이터로 변경
+      const formatValue = d3.format(",.2f");
+      const dateFormatter = d3.timeFormat("%y/%m/%d %I:%M:%S");
+     
+     // 그래프로 그리기 전에 쓸 수 있는 데이터로 변경
       this.csvData.forEach(function(d) {
         d.DateTime = parseDateTime(d.DateTime);
         d.averageSpeed = +d.averageSpeed;
@@ -94,7 +96,7 @@ export default {
                       .tickFormat(function(d) { return d3.format(".1f")(d) + "km/h"; })
                       .ticks(4)
                       .tickValues([0, 10.8, 14.4, 19.8, 25.2]);
-
+      
       let brush = d3.brushX()
         .extent([[0, 0], [this.width, this.heightNavigator]])
         .on("brush end", brushed)
@@ -130,7 +132,7 @@ export default {
       const context = chartRoot.append("g")
         .attr("class", "context")
         .attr("transform", "translate(0," + (this.height + this.margin.bottom)  + ")")
-        
+      
       // 축의 데이터 범위 설정 
       const dataXrange = d3.extent(this.csvData, function(d) { return d.DateTime; });
       const dataYrange = [0, d3.max(this.csvData, function(d) { return +d.averageSpeed; })];
@@ -171,6 +173,10 @@ export default {
         .attr("fill", "none")
         .attr("stroke", "rgba(70, 130, 180, 0.42)")
         .attr("stroke-width", 1.2)
+
+      const tooltip = focus.append("g")
+        .attr("class", "tooltip")
+        .style("display", "none");
 
       context.append("path")
         .datum(this.csvData)
@@ -216,33 +222,54 @@ export default {
         focus.select(".axis--x").call(xAxis);
         chartRoot.select(".brush").call(brush.move, x.range().map(t.invertX, t));
       }
+  
+
+      tooltip.append("circle")
+        .attr("r", 3);
+
+      tooltip.append("rect")
+        .attr("class", "chart__tooltip")
+        .attr("width", 120)
+        .attr("height", 50)
+        .attr("x", 10)
+        .attr("y", -22)
+        .attr("rx", 4)
+        .attr("ry", 4);
+
+      tooltip.append("text")
+          .attr("class", "tooltip-date")
+          .attr("x", 18)
+          .attr("y", -2);
+
+      tooltip.append("text")
+        .attr("x", 18)
+        .attr("y", 18)
+        .text("평균 속도: ");
+
+      tooltip.append("text")
+          .attr("class", "tooltip-likes")
+          .attr("x", 70)
+          .attr("y", 18);
+
+      chartRoot.append("rect")
+        .attr("class", "overlay")
+        .attr("height", this.height)
+        .attr("width", this.width)
+        .on("mouseover", function() { tooltip.style("display", null); })
+        .on("mouseout", function() { tooltip.style("display", "none"); })
+        .on("mousemove", mousemove);
       
-      /* create a tooltip */
-      // const tooltip = d3.select("#lineSpeedChart")
-      //   .append("div")
-      //   .style("opacity", 0)
-      //   .attr("class", "chart__tooltip")
-
-      // chartRoot.append("rect")
-      //   .attr("class", "overlay")
-      //   .attr("height", this.height)
-      //   .attr("width", this.width)
-      //   .on("mouseover", function() { focus.style("display", null); })
-      //   // .on("mouseout", function() { focus.style("display", "none"); })
-      //   .on("mousemove", mousemove);
-
-      // function mousemove() {
-      //   console.log("tooltip_mouse", x.invert(d3.mouse(this)[0]));
-      //   console.log("i", bisectDate(this.csvData, x.invert(d3.mouse(this)[0]), 1));
-      //       var x0 = x.invert(d3.mouse(this)[0]),
-      //           i = bisectDate(this.csvData, x0, 1),
-      //           d0 = this.csvData[i - 1],
-      //           d1 = this.csvData[i],
-      //           d = x0 - d0.DateTime > d1.DateTime - x0 ? d1 : d0;
-      //       focus.attr("transform", "translate(" + x(d.DateTime) + "," + y(d.averageSpeed) + ")");
-      //       focus.select(".tooltip-date").text(dateFormatter(d.DateTime));
-      //       focus.select(".tooltip-likes").text(formatValue(d.averageSpeed));
-      // }
+      let _this = this
+      function mousemove() {
+        var x0 = x.invert(d3.mouse(this)[0]),
+            i = bisectDate(_this.csvData, x0, 1),
+            d0 = _this.csvData[i - 1],
+            d1 = _this.csvData[i],
+            d = x0 - d0.DateTime > d1.DateTime - x0 ? d1 : d0;
+        tooltip.attr("transform", "translate(" + x(d.DateTime) + "," + y(d.averageSpeed)  + ")");
+        tooltip.select(".tooltip-date").text(dateFormatter(d.DateTime));
+        tooltip.select(".tooltip-likes").text(formatValue(d.averageSpeed));
+      }
     },
   }
 }
@@ -354,6 +381,19 @@ export default {
 .overlay {
   fill: none;
   pointer-events: all;
+}
+
+
+.tooltip {
+  fill: white;
+  stroke: #000;
+  stroke-width: 0.4px;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.tooltip-date, .tooltip-likes {
+  font-size: 12px;
 }
 
 </style>
