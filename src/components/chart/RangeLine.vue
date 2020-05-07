@@ -51,6 +51,7 @@ export default {
       const parseDateTime = d3.timeParse("%Y-%m-%d %I:%M:%S");
       const bisectDate = d3.bisector(function(d) { return d.DateTime; }).left;
       const formatValue = d3.format(",.2f");
+      // const formatValue = d3.format(",.2f");
       const dateFormatter = d3.timeFormat("%y/%m/%d %I:%M:%S");
      
      // 그래프로 그리기 전에 쓸 수 있는 데이터로 변경
@@ -176,7 +177,8 @@ export default {
 
       const tooltip = focus.append("g")
         .attr("class", "tooltip")
-        .style("display", "none");
+        .style("position", "absolute")
+        .style("visibility", "hidden")
 
       context.append("path")
         .datum(this.csvData)
@@ -198,7 +200,7 @@ export default {
         .attr("class", "zoom")
         .attr("fill", "none")
         .attr("width", this.width)
-        .attr("height", this.height)
+        .attr("height", this.height + (this.margin.bottom / 2))
         .call(zoom);
 
       function brushed() {
@@ -223,52 +225,69 @@ export default {
         chartRoot.select(".brush").call(brush.move, x.range().map(t.invertX, t));
       }
   
-
-      tooltip.append("circle")
-        .attr("r", 3);
-
       tooltip.append("rect")
         .attr("class", "chart__tooltip")
-        .attr("width", 120)
-        .attr("height", 50)
+        .attr("width", 170)
+        .attr("height", 70)
         .attr("x", 10)
         .attr("y", -22)
         .attr("rx", 4)
         .attr("ry", 4);
 
       tooltip.append("text")
-          .attr("class", "tooltip-date")
+          .attr("class", "tooltip__date")
           .attr("x", 18)
           .attr("y", -2);
 
       tooltip.append("text")
+        .attr("class", "tooltip__text")
         .attr("x", 18)
         .attr("y", 18)
+        .attr("fill", "#000")
         .text("평균 속도: ");
+      
+      tooltip.append("text")
+        .attr("class", "tooltip__text")
+        .attr("x", 18)
+        .attr("y", 38)
+        .attr("fill", "#000")
+        .text("속도 범위: ");
 
       tooltip.append("text")
-          .attr("class", "tooltip-likes")
+          .attr("class", "tooltip__averageSpeed")
           .attr("x", 70)
           .attr("y", 18);
 
-      chartRoot.append("rect")
+      tooltip.append("text")
+          .attr("class", "tooltip__averageLow")
+          .attr("x", 70)
+          .attr("y", 38);
+
+      const overlay = chartRoot.append("rect")
         .attr("class", "overlay")
-        .attr("height", this.height)
+        .attr("height", this.height + (this.margin.bottom / 2))
         .attr("width", this.width)
-        .on("mouseover", function() { tooltip.style("display", null); })
-        .on("mouseout", function() { tooltip.style("display", "none"); })
+        .on("mouseover", function() { tooltip.style("visibility", "visible"); })
+        .on("mouseout", function() { tooltip.style("visibility", "hidden"); })
         .on("mousemove", mousemove);
       
-      let _this = this
+      let _this = this;
       function mousemove() {
         var x0 = x.invert(d3.mouse(this)[0]),
             i = bisectDate(_this.csvData, x0, 1),
             d0 = _this.csvData[i - 1],
             d1 = _this.csvData[i],
-            d = x0 - d0.DateTime > d1.DateTime - x0 ? d1 : d0;
-        tooltip.attr("transform", "translate(" + x(d.DateTime) + "," + y(d.averageSpeed)  + ")");
-        tooltip.select(".tooltip-date").text(dateFormatter(d.DateTime));
-        tooltip.select(".tooltip-likes").text(formatValue(d.averageSpeed));
+            d = x0 - d0.DateTime > d1.DateTime - x0 ? d1 : d0
+          
+        let pointXaxis = this.getPointAtLength(x(d.DateTime)),
+            pointYaxis = this.getPointAtLength(y(d.averageSpeed)),
+            tooltipX = (_this.width / 2) - pointXaxis.x < 0 ? pointXaxis.x-180 : pointXaxis.x,
+            tooltipY = (_this.height / 2) - pointYaxis.x < 0 ? pointYaxis.x-60 : pointYaxis.x;
+        tooltip.attr("transform", `translate(${tooltipX}, ${tooltipY})`);
+        tooltip.style("top", (d3.event.pageY)+"px").style("left",(d3.event.pageX)+"px")
+        tooltip.select(".tooltip__date").text(dateFormatter(d.DateTime));
+        tooltip.select(".tooltip__averageSpeed").text(formatValue(d.averageSpeed) + " km/h");
+      tooltip.select(".tooltip__averageLow").text(formatValue(d.speedRangeLow) + " km/h ~ " + formatValue(d.speedRangeHigh));
       }
     },
   }
@@ -392,8 +411,10 @@ export default {
   font-weight: 400;
 }
 
-.tooltip-date, .tooltip-likes {
+.tooltip__date, .tooltip__averageSpeed, .tooltip__averageLow {
   font-size: 12px;
+  fill: #000;
+  stroke: #000;
 }
 
 </style>
