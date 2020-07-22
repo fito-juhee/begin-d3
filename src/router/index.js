@@ -8,6 +8,7 @@ import BarChart from "../views/chart/BarChart.vue";
 import stockBarChart from "../views/chart/StockBar.vue";
 import lineChart from "../views/chart/Line.vue";
 import speedRange from "../views/chart/SpeedRange.vue";
+import density from "../views/chart/Density.vue";
 
 // vue-router 를 Vue instance 에 등록
 Vue.use(VueRouter);
@@ -47,6 +48,11 @@ const routes = [
     path: "/speedRange",
     name: "SpeedRange",
     component: speedRange
+  },
+  {
+    path: "/density",
+    name: "Density",
+    component: density
   },
 ];
 
