@@ -60,6 +60,9 @@
           >Combination</a
         >
       </li>
+      <li>
+        <a href="/density"> density </a>
+      </li>
     </ul>
     
   </div>
