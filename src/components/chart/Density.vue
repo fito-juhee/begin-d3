@@ -47,14 +47,7 @@ export default {
         .attr("width", 400)
         .attr("height", 400)
 
-      // .append("image")
-      //   .attr("xlink:href","https://i.imgur.com/tWr3JBD.jpg")
-      //   .attr("x",0)
-      //   .attr("y",0)
-      //   .attr("width",300)
-      //   .attr("height",300)  
-
-    // read data
+    // D3 Read Data
     // http://learnjsdata.com/read_data.html
 
     // "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_for_density2d.csv"
@@ -67,29 +60,16 @@ export default {
           processed_data.push(datum)
         }
       }
-      // let tmp_data = []
-      // for (let i = 5; i<20; i = i + 0.2){
-      //   for (let j = 5; j<25; j = j + 0.2){
-      //     for (let z = 0; z < i+j; z++){
-      //       tmp_data.push({x:i, y:j})
-      //     }
-      //   }
-      // }
       
       // Add X axis
       var x = d3.scaleLinear()
         .domain([0, 120])
         .range([ margin.left, width - margin.right ]);
-      svg.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(x));
 
-      // Add Y axis
+      // // Add Y axis
       var y = d3.scaleLinear()
         .domain([0, 100])
         .range([ height - margin.bottom, margin.top ]);
-      svg.append("g")
-        .call(d3.axisLeft(y));
 
       // Prepare a color palette
       var color = d3.scaleLinear()
