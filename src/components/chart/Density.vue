@@ -8,6 +8,8 @@
 
 <script>
 // https://www.d3-graph-gallery.com/graph/density2d_shading.html
+// https://github.com/d3/d3-contour 
+// https://devdocs.io/d3~5/d3-contour
 import * as d3 from "d3";
 
 export default {
@@ -35,11 +37,29 @@ export default {
 
     // read data
     // http://learnjsdata.com/read_data.html
-    d3.csv("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_for_density2d.csv").then(function(data) {
+
+    // "https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/data_for_density2d.csv"
+    // "https://raw.githubusercontent.com/fito-cheol/SampleFileStorage/master/hitmap.csv"
+    d3.csv("https://raw.githubusercontent.com/fito-cheol/SampleFileStorage/master/hitmapData.csv").then(function(data) {
+      let processed_data = []
+      for (let i in data){
+        let datum = data[i]
+        for (let j =0; j< datum.recode_level_total ;j++){
+          processed_data.push(datum)
+        }
+      }
+      // let tmp_data = []
+      // for (let i = 5; i<20; i = i + 0.2){
+      //   for (let j = 5; j<25; j = j + 0.2){
+      //     for (let z = 0; z < i+j; z++){
+      //       tmp_data.push({x:i, y:j})
+      //     }
+      //   }
+      // }
       
       // Add X axis
       var x = d3.scaleLinear()
-        .domain([5, 20])
+        .domain([0, 120])
         .range([ margin.left, width - margin.right ]);
       svg.append("g")
         .attr("transform", "translate(0," + height + ")")
@@ -47,23 +67,26 @@ export default {
 
       // Add Y axis
       var y = d3.scaleLinear()
-        .domain([5, 25])
+        .domain([0, 100])
         .range([ height - margin.bottom, margin.top ]);
       svg.append("g")
         .call(d3.axisLeft(y));
 
       // Prepare a color palette
       var color = d3.scaleLinear()
-          .domain([0, 1]) // Points per square pixel.
-          .range(["white", "#69b3a2"])
+          .domain([0, 1, 2, 4]) // Points per square pixel.
+          .range(["#8080ff", "#7FE562", "#fbe50b", "#ff3729" ])
 
       // compute the density data
+      console.log(data)
       var densityData = d3.contourDensity()
-        .x(function(d) { return x(d.x); })
+        .x(function(d) { return x(125-d.x); }) // 앞에 x()는 d3.scaleLinear(), 뒤에 d.x는 .csv column name
         .y(function(d) { return y(d.y); })
         .size([width, height])
-        .bandwidth(20)
-        (data)
+        .bandwidth(4)
+        (processed_data)
+
+      console.log(densityData)
 
       // show the shape!
       svg.insert("g", "g")
@@ -71,7 +94,7 @@ export default {
         .data(densityData)
         .enter().append("path")
           .attr("d", d3.geoPath())
-          .attr("fill", function(d) { return color(d.value); })
+          .attr("fill", function(d) { console.log(d, d.value); return color(d.value); }) // value에 뭐가 찍히는걸까
       
     })
   },
