@@ -33,7 +33,26 @@ export default {
         .attr("height", height + margin.top + margin.bottom)
       .append("g")
         .attr("transform",
-              "translate(" + margin.left + "," + margin.top + ")");
+              "translate(" + margin.left + "," + margin.top + ")")
+
+      svg.append("rect")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .attr("fill", "black");
+      svg.append("image")
+        // .attr("xlink:href", "https://food.fnr.sndimg.com/content/dam/images/food/fullset/2012/11/2/0/DV1510H_fried-chicken-recipe-10_s4x3.jpg.rend.hgtvcom.826.620.suffix/1568222255998.jpeg")
+        .attr("xlink:href", "https://ohcoach.com/common/images/court.png")
+        .attr("x",0)
+        .attr("y",0)
+        .attr("width", 400)
+        .attr("height", 400)
+
+      // .append("image")
+      //   .attr("xlink:href","https://i.imgur.com/tWr3JBD.jpg")
+      //   .attr("x",0)
+      //   .attr("y",0)
+      //   .attr("width",300)
+      //   .attr("height",300)  
 
     // read data
     // http://learnjsdata.com/read_data.html
@@ -83,7 +102,7 @@ export default {
         .x(function(d) { return x(125-d.x); }) // 앞에 x()는 d3.scaleLinear(), 뒤에 d.x는 .csv column name
         .y(function(d) { return y(d.y); })
         .size([width, height])
-        .bandwidth(4)
+        .bandwidth(4) // smaller = more precision in lines = more lines
         (processed_data)
 
       console.log(densityData)
