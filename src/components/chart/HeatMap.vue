@@ -4,8 +4,10 @@
       <g v-for = "colIndex in 5" :key="colIndex" >
         <line :x1='100+colIndex*100' y1='0' :x2='100+colIndex*100' y2='90' style='stroke: #000; stroke-width:1;' />
       </g>
-      
-      <line x1='300' y1='0' x2='300' y2='90' style='stroke: #000; stroke-width:1;' />
+      <text class='zone_group' text-anchor='middle' x='150' y='50' :fill='textColor'>
+          <tspan x='150' dy='0' font-size='12' fill='#6c6c6c' font-weight='bolder'> 왼쪽 첫번째 </tspan>
+          <tspan x='150' dy='25'> 90%</tspan>
+      </text>
     </svg>
     <div style='display: inline-flex'>
       <svg id="left_label" width="100" height="410"> 
@@ -31,7 +33,7 @@ export default {
   
   data() {
     return {
-      
+      textColor: '#648cf8',
     }
   },
   mounted() {
