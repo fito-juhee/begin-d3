@@ -5,7 +5,7 @@
         <line :x1='100+colIndex*100' y1='0' :x2='100+colIndex*100' y2='90' style='stroke: #000; stroke-width:1;' />
       </g>
       <text class='zone_group' text-anchor='middle' x='150' y='50' :fill='textColor'>
-          <tspan x='150' dy='0' font-size='12' fill='#6c6c6c' font-weight='bolder'> 왼쪽 첫번째 </tspan>
+          <tspan x='150' dy='0' font-size='12' fill='#6c6c6c' font-weight='bolder'> 위쪽 첫번째 </tspan>
           <tspan x='150' dy='25'> 90%</tspan>
       </text>
     </svg>
@@ -13,6 +13,10 @@
       <svg id="left_label" width="100" height="410"> 
         <line x1='30' y1='137' x2='100' y2='137' style='stroke: #000; stroke-width:1;' />
         <line x1='30' y1='274' x2='100' y2='274' style='stroke: #000; stroke-width:1;' />
+        <text class='zone_group' text-anchor='middle' x='60' y='63.5' :fill='textColor'>
+          <tspan x='60' dy='0' font-size='12' fill='#6c6c6c' font-weight='bolder'>왼쪽 첫번째</tspan>
+          <tspan x='60' dy='25'>30%</tspan>
+        </text>
       </svg>
       <svg id="heatmap_area" class="heatmap_area" width="600" height="410">
         <g v-for = "colIndex in 6" :key="colIndex" >
