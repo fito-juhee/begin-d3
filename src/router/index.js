@@ -9,6 +9,7 @@ import stockBarChart from "../views/chart/StockBar.vue";
 import lineChart from "../views/chart/Line.vue";
 import speedRange from "../views/chart/SpeedRange.vue";
 import density from "../views/chart/Density.vue";
+import heatmap from "../views/chart/HeatMap.vue";
 
 // vue-router 를 Vue instance 에 등록
 Vue.use(VueRouter);
@@ -53,6 +54,11 @@ const routes = [
     path: "/density",
     name: "Density",
     component: density
+  },
+  {
+    path: "/heatmap",
+    name: "HeatMap",
+    component: heatmap
   },
 ];
 

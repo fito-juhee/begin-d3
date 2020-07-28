@@ -62,6 +62,7 @@
       </li>
       <li>
         <a href="/density"> density </a>
+        <a href="/heatmap"> heatmap </a>
       </li>
     </ul>
     
