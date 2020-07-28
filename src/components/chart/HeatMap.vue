@@ -5,10 +5,10 @@
     <svg id="heatmap_area" class="heatmap_area" width="600" height="410">
       <!-- <rect x='0' y='0' rx='3' ry='3' width='100' height='137' style='fill: #F8002A; opacity:0.5;' />
       <text class='zone_group' text-anchor='middle' x='50' y='69' fill='#fff'> 123 </text> -->
-      <g v-for = "rowIndex in 6" :key="rowIndex" >
-        <g v-for = "colIndex in 3" :key="colIndex" >          
-          <rect :x='100*(rowIndex -1)' :y='137*(colIndex-1)' rx='0' ry='0' width="100" height='137' :style='getStyle(rowIndex,colIndex)' />
-          <text class='zone_group' text-anchor='middle' :x='-50 + 100*rowIndex' :y='-68.5 + 137 * colIndex' fill='#fff'> 123 </text>
+      <g v-for = "colIndex in 6" :key="colIndex" >
+        <g v-for = "rowIndex in 3" :key="rowIndex" >          
+          <rect :x='100*(colIndex -1)' :y='137*(rowIndex-1)' rx='0' ry='0' width="100" height='137' :style='getStyle(rowIndex, colIndex)' />
+          <text class='zone_group' text-anchor='middle' :x='-50 + 100*colIndex' :y='-68.5 + 137 * rowIndex' fill='#fff'> {{colIndex  + rowIndex*6 -6}} </text>
         </g>
       </g>
     </svg>
